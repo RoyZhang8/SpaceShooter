@@ -19,6 +19,9 @@ using UnityEngine.SceneManagement; //libraries for accessing scenes
 public enum GameState { Title, Playing, BeatLevel, LostLevel, GameOver, Idle , Testing };
 //enum of game states (work like it's own class)
 
+//GameManager required an Audio Source
+[RequireComponent(typeof(AudioSource))]
+
 public class GameManager : MonoBehaviour
 {
     /*** VARIABLES ***/
@@ -63,6 +66,10 @@ public class GameManager : MonoBehaviour
     private int defaultHighScore = 1000;
     static public int highScore = 1000; // the default High Score
     public int HighScore { get { return highScore; } set { highScore = value; } }//access to private variable highScore [get/set methods]
+
+    [Space(10)]
+    public AudioClip backgroundMusicClip; //sound clip for background music
+    private AudioSource audioSource; //reference to the audio source
 
     [Space(10)]
     
@@ -137,6 +144,17 @@ public class GameManager : MonoBehaviour
     //Start is called once before the update
     void Start()
     {
+
+        //if background music exsists
+        if (backgroundMusicClip != null)
+        {
+            audioSource = gm.GetComponent<AudioSource>(); //reference to the Audio Source Component
+            audioSource.volume = 0.5f; //the volume level of the sound
+            audioSource.clip = backgroundMusicClip; //the music clip to play
+            audioSource.loop = true; //loop the music clip
+            audioSource.Play(); //play the clip 
+        }//end if (backgroundMusicSource != null)
+
         //if we run play the game from the level instead of start scene (PLAYTESTING ONLY)
         if (currentSceneName != startScene) { SetGameState(GameState.Testing); }//set the game state for testing }
 

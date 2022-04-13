@@ -3,7 +3,7 @@
  * Date Created: March 16, 2022
  * 
  * Last Edited by:Ruoyu Zhang 
- * Last Edited:6/4/2022
+ * Last Edited:13/4/2022
  * 
  * Description: Hero ship controller
 ****/
@@ -39,6 +39,8 @@ public class Hero : MonoBehaviour
 
     GameManager gm; //reference to game manager
 
+    ObjectPool pool; //refence to Object Pool
+
     [Header("Ship Movement")]
     public float speed = 10;
     public float rollMult = -45;
@@ -49,9 +51,13 @@ public class Hero : MonoBehaviour
     [Space(10)]
 
     [Header("Projectile Setting")]
-    public GameObject projectilePrefab;
+    //public GameObject projectilePrefab;
     public float projectileSpeed = 40;
+    public AudioClip projectSound; //sound clip of projectile
+    private AudioSource audioSource; //the audio source of the game object
 
+
+    [Space(10)]
 
     private GameObject lastTriggerGo; //reference to the last triggering game object
    
@@ -92,6 +98,8 @@ public class Hero : MonoBehaviour
     private void Start()
     {
         gm = GameManager.GM; //find the game manager
+        pool = ObjectPool.POOL; //find the game manager
+        audioSource = GetComponent<AudioSource>(); //get refrence to audio source
     }//end Start()
 
 
@@ -114,6 +122,12 @@ public class Hero : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             FireProjectile();
+
+            //If there is an audio source 
+            if (audioSource != null)
+            {
+                audioSource.PlayOneShot(projectSound); //play projectileSound
+            }
         }
 
 
@@ -145,10 +159,14 @@ public class Hero : MonoBehaviour
 
     void FireProjectile()
     {
-        GameObject projGo = Instantiate<GameObject>(projectilePrefab);
-        projGo.transform.position = transform.position;
-        Rigidbody rb = projGo.GetComponent<Rigidbody>();
-        rb.velocity = Vector3.up * projectileSpeed;
+        GameObject projGo = pool.GetObject(); //get object from pool
+                                                  //if there is a projectile object
+        if (projGo != null)
+        {
+            projGo.transform.position = transform.position; //set position to the ships position
+            Rigidbody rb = projGo.GetComponent<Rigidbody>(); //get rigidbody of the projectile
+            rb.velocity = Vector3.up * projectileSpeed; //use velocity to move projectile
+        }//end if(projectile != null)
 
     }
 
